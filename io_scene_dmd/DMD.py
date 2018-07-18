@@ -154,6 +154,60 @@ class MultyMesh:
     #---------------------------------------------------------------------------
     #
     #---------------------------------------------------------------------------
+    def readTextureBlock(self, dmd_cont):
+        line = dmd_cont.getLine()
+        line = dmd_cont.getLine()
+        tex_data = line.split(" ")
+
+        tmp = []
+        for td in tex_data:
+            try:
+                tmp.append(int(td))
+            except ValueError:
+                pass
+
+        self.tex_v_count = tmp[0]
+        self.tex_f_count = tmp[1]
+
+        line = dmd_cont.getLine()
+
+        if line != "Texture vertices:":
+            self.texture_present = False
+            return
+
+        for i in range(0, self.tex_v_count):
+            line = dmd_cont.getLine()
+            vertex = line.strip('\t').split(" ")
+            try:
+                x = float(vertex[0])
+                y = float(vertex[1])
+                z = float(vertex[2])
+                self.tex_vertices.append([x, y, z])
+            except Exception as ex:
+                print(ex)
+                return
+
+        line = dmd_cont.getLine()
+        line = dmd_cont.getLine()
+
+        for i in range(0, self.tex_f_count):
+            line = dmd_cont.getLine()
+            face_data = line.strip('\t').split(" ")
+            face = []
+            for f in face_data:
+                try:
+                    face.append(int(f))
+                except Exception as ex:
+                    print(ex)
+                    return
+            self.tex_faces.append(face)
+
+        self.texture_present = True
+
+
+    #---------------------------------------------------------------------------
+    #
+    #---------------------------------------------------------------------------
     def loadFromFile(self, filepath):
         dmd_cont = FileContainer()
         dmd_cont.load(filepath)
@@ -164,7 +218,7 @@ class MultyMesh:
                 self.readNextMesh(dmd_cont)
 
             if line == "New Texture:":
-                pass
+                self.readTextureBlock(dmd_cont)
 
             line = dmd_cont.getLine()
 
