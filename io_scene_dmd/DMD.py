@@ -142,7 +142,7 @@ class MultyMesh:
             face = []
             for f in face_data:
                 try:
-                    face.append(int(f))
+                    face.append(int(f) - 1)
                 except Exception as ex:
                     print(ex)
                     return
@@ -150,6 +150,8 @@ class MultyMesh:
             mesh.faces.append(face)
 
         self.meshes.append(mesh)
+
+        print("Loaded: ", mesh.vertex_count, " vertices ", mesh.faces_count, " faces")
 
     #---------------------------------------------------------------------------
     #
@@ -173,6 +175,7 @@ class MultyMesh:
 
         if line != "Texture vertices:":
             self.texture_present = False
+            print("Texture is't present")
             return
 
         for i in range(0, self.tex_v_count):
@@ -196,7 +199,7 @@ class MultyMesh:
             face = []
             for f in face_data:
                 try:
-                    face.append(int(f))
+                    face.append(int(f) - 1)
                 except Exception as ex:
                     print(ex)
                     return
@@ -204,6 +207,7 @@ class MultyMesh:
 
         self.texture_present = True
 
+        print("Loaded texture data about ", self.tex_v_count, " vertices ", self.tex_f_count, " faces")
 
     #---------------------------------------------------------------------------
     #

@@ -5,7 +5,7 @@
 #       Разработал: Притыкин Д.Е.
 #
 #-------------------------------------------------------------------------------
-'''
+
 bl_info = {
     "name": "Importer/Exporter DGLEngine DMD models",
     "category": "Import-Export",
@@ -22,14 +22,20 @@ import bpy
 class DMDImporter(bpy.types.Operator):
     """DMD models importer"""
     bl_idname = "import_scene.dmd"
-    bl_label = "DGLEngine DMD model"
+    bl_label = "DGLEngine DMD model (*.dmd)"
     bl_options = {'REGISTER', 'UNDO'}
+
+    filepath = bpy.props.StringProperty(subtype='FILE_PATH')
 
     #---------------------------------------------------------------------------
     #
     #---------------------------------------------------------------------------
     def execute(self, context):
-        pass
+        from .DMDimport import Importer
+        dmd_loader = Importer()
+        dmd_loader.load(self.filepath)
+
+        return {'FINISHED'}
 
     #---------------------------------------------------------------------------
     #
@@ -63,4 +69,3 @@ def unregister():
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     register()
-'''
