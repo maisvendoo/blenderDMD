@@ -24,8 +24,31 @@ def getFileName(path):
 class Importer:
 
     def __init__(self):
-
         self.dmd = MultyMesh()
+
+    #---------------------------------------------------------------------------
+    #
+    #---------------------------------------------------------------------------
+    def setUVcoords(self, md, mesh):
+        bm = bmesh.new()
+        bm.from_mesh(md)
+
+        uv_layer = bm.loops.layers.uv.new()
+
+        # Перебираем все грани
+        for i, f in enumerate(bm.faces):
+            tex_face = mesh.parent.tex_faces[i]
+            for v, l in zip(tex_face, f.loops):
+                l_uv = l[uv_layer]
+                try:
+                    tmp = mesh.parent.tex_vertices[v]
+                    l_uv.uv[0] = tmp[0]
+                    l_uv.uv[1] = tmp[1]
+                except Exception as ex:
+                    print(ex)
+                    return
+
+        bm.to_mesh(md)
 
     #---------------------------------------------------------------------------
     #
@@ -38,6 +61,7 @@ class Importer:
             obj_name = getFileName(filepath)
             print("Process new model: ", obj_name)
 
+            # Загружаем геометрию
             md = bpy.data.meshes.new(obj_name + "-" + str(m_idx))
             print("Mesh name: ", md.name)
             print("New mesh created...OK")
@@ -45,6 +69,9 @@ class Importer:
             print("Loaded data to mesh...OK")
             md.update(calc_edges=True)
             print("Mesh update...OK")
+
+            # Загружаем текстурные координаты
+            self.setUVcoords(md, m)
 
             obj = bpy.data.objects.new(md.name, md)
             print("New scene object creation...OK")

@@ -72,6 +72,7 @@ class Mesh:
         self.fextentY = 0.0
         self.fextentZ = 0.0
         self.scale_type = 0
+        self.parent = None
 
 
 #-------------------------------------------------------------------------------
@@ -149,6 +150,7 @@ class MultyMesh:
 
             mesh.faces.append(face)
 
+        mesh.parent = self
         self.meshes.append(mesh)
 
         print("Loaded: ", mesh.vertex_count, " vertices ", mesh.faces_count, " faces")
