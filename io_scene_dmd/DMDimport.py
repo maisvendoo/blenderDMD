@@ -37,10 +37,13 @@ class Importer:
 
         # Перебираем все грани
         for i, f in enumerate(bm.faces):
+            # Получаем список индексов текстурных вершин конкретной грани
             tex_face = mesh.parent.tex_faces[i]
             for v, l in zip(tex_face, f.loops):
+                # Берем слой развертки для конкретной грани
                 l_uv = l[uv_layer]
                 try:
+                    # читаем текстурные координаты для конкретной вершины в данном слое
                     tmp = mesh.parent.tex_vertices[v]
                     l_uv.uv[0] = tmp[0]
                     l_uv.uv[1] = tmp[1]
@@ -73,8 +76,10 @@ class Importer:
             # Загружаем текстурные координаты
             self.setUVcoords(md, m)
 
+            # Создаем новый объект на основе считанной геометрии
             obj = bpy.data.objects.new(md.name, md)
             print("New scene object creation...OK")
+            # Присоединяем новый объект к сцене
             bpy.context.scene.objects.link(obj)
             print("Link object to scene...OK")
 

@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-#
+#   Контейнер для содержимого файла *.dmd с построчным доступом к содержимому
 #-------------------------------------------------------------------------------
 class FileContainer:
 
@@ -17,11 +17,13 @@ class FileContainer:
         self.length = 0
 
     #---------------------------------------------------------------------------
-    #
+    #   Загрузка текста файла *.dmd модели
     #---------------------------------------------------------------------------
     def load(self, filepath):
         try:
+            # Открываем файл на чтение
             f = open(filepath, 'rt')
+            # Вычитываем весь файл и разбираем его на строки
             self.dmd_text = f.read().split('\n')
             self.line_index = 0
             self.length = len(self.dmd_text)
@@ -35,7 +37,7 @@ class FileContainer:
             return False
 
     #---------------------------------------------------------------------------
-    #
+    #   Получение очередной строки файла *.dmd
     #---------------------------------------------------------------------------
     def getLine(self):
         line = ""
@@ -47,17 +49,18 @@ class FileContainer:
             return None
 
     #---------------------------------------------------------------------------
-    #
+    #   Проверка конца файла *.dmd
     #---------------------------------------------------------------------------
     def eof(self):
         return self.line_index > self.length - 1
 
 #-------------------------------------------------------------------------------
-#
+#   Класс для хранения полигональной сетки
 #-------------------------------------------------------------------------------
 class Mesh:
 
     def __init__(self):
+
         self.vertices = []
         self.faces = []
         self.faset_normals = []
@@ -76,7 +79,7 @@ class Mesh:
 
 
 #-------------------------------------------------------------------------------
-#
+#   Класс для хранения геометрии всей модели *.dmd
 #-------------------------------------------------------------------------------
 class MultyMesh:
 
@@ -96,17 +99,20 @@ class MultyMesh:
         self.texture_present = False
 
     #---------------------------------------------------------------------------
-    #
+    #   Чтение полигональной сетки
     #---------------------------------------------------------------------------
     def readNextMesh(self, dmd_cont):
 
+        # Содаем новую полигональную сетку
         mesh = Mesh()
 
         line = dmd_cont.getLine()
 
+        # Ищем начало блока вершин и граней
         while (line != "numverts numfaces") and line is not None:
             line = dmd_cont.getLine()
 
+        # Читаем общее число вершин и граней
         line = dmd_cont.getLine()
         geom_data = line.split(" ")
 
@@ -122,6 +128,7 @@ class MultyMesh:
 
         line = dmd_cont.getLine()
 
+        # Читаем координаты всех вершин модели
         for i in range(0, mesh.vertex_count):
             line = dmd_cont.getLine()
             vertex_data = line.strip('\t').split(" ")
@@ -137,6 +144,8 @@ class MultyMesh:
         line = dmd_cont.getLine()
         line = dmd_cont.getLine()
 
+        # Читаем все грани моделей (списки номеров вершин, вершины нумеруются в порядке их появления
+        # в предыдущем блоке
         for i in range(0, mesh.faces_count):
             line = dmd_cont.getLine()
             face_data = line.rstrip('\t').split(" ")
@@ -150,19 +159,21 @@ class MultyMesh:
 
             mesh.faces.append(face)
 
+        # Запоминаем родительский контейнер (MultyMesh)
         mesh.parent = self
         self.meshes.append(mesh)
 
         print("Loaded: ", mesh.vertex_count, " vertices ", mesh.faces_count, " faces")
 
     #---------------------------------------------------------------------------
-    #
+    #   Чтение UV-развертки
     #---------------------------------------------------------------------------
     def readTextureBlock(self, dmd_cont):
         line = dmd_cont.getLine()
         line = dmd_cont.getLine()
         tex_data = line.split(" ")
 
+        # Читаем общее число текстурных вершин и текстурированных граней
         tmp = []
         for td in tex_data:
             try:
@@ -175,6 +186,7 @@ class MultyMesh:
 
         line = dmd_cont.getLine()
 
+        # Читаем текстурные вершины
         if line != "Texture vertices:":
             self.texture_present = False
             print("Texture is't present")
@@ -195,6 +207,7 @@ class MultyMesh:
         line = dmd_cont.getLine()
         line = dmd_cont.getLine()
 
+        # Читаем текстурированные грани
         for i in range(0, self.tex_f_count):
             line = dmd_cont.getLine()
             face_data = line.strip('\t').split(" ")
@@ -215,9 +228,12 @@ class MultyMesh:
     #
     #---------------------------------------------------------------------------
     def loadFromFile(self, filepath):
+
+        # Создаем контейнер и заполняем его содержимым файла *.dmd
         dmd_cont = FileContainer()
         dmd_cont.load(filepath)
 
+        # Цикл построчного разбора файла
         line = dmd_cont.getLine()
         while  line is not None:
             if line == "New object":
