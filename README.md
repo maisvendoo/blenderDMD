@@ -1,4 +1,4 @@
-# BlenderDMD: Blender plugin for DGLEngine modeles import
+# BlenderDMD: Blender plugin for DGLEngine models import
 
 This plugin provide import of geometry and UV-map from *.dmd models file. This format uses by DGLEngine 3D game engine. DGLEngine uses in some games, such as [ZDSimulator](https://zdsimulator.com.ua/) and other.
 
