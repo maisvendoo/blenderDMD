@@ -60,17 +60,21 @@ class Exporter:
                     if mat.texture_slots:
                         dmd_model.texture_present = True
 
+                        loop_vert = {l.index: l.vertex_index for l in md.loops}
+
                         for f in md.polygons:
                             tex_face = []
-                            for uv_layer in md.uv_layers:
-                                for i in f.loop_indices:
-                                    tex_face.append(i)
-                                    uv = uv_layer.data[i].uv
-                                    texel = [uv[0], uv[1], 0.0]
-                                    dmd_model.tex_vertices.append(texel)
-                                    dmd_model.tex_v_count += 1;
+                            for loop in f.loop_indices:
+                                uv = md.uv_layers.active.data[loop].uv
+                                print(uv)
+                                tmp = list(uv)
+                                texel = [tmp[0], 1 - tmp[1], 0.0]
+                                dmd_model.tex_vertices.append(texel)
+                                dmd_model.tex_v_count += 1;
 
-                                dmd_model.tex_faces.append(tex_face)
-                                dmd_model.tex_f_count += 1;
+                                tex_face.append(loop_vert[loop])
+
+                            dmd_model.tex_faces.append(tex_face)
+                            dmd_model.tex_f_count += 1;
 
         dmd_model.writeToFile(path, dmd_model)
