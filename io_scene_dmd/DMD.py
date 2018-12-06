@@ -245,4 +245,64 @@ class MultyMesh:
             line = dmd_cont.getLine()
 
 
+    def writeToFile(self, path, dmd_model):
+
+        dmd_text = []
+        dmd_text.append("New onject\n")
+
+        for mesh in dmd_model.meshes:
+            dmd_text.append("TriMesh()\n")
+            dmd_text.append("numverts numfaces\n")
+            dmd_text.append("\t" +str(mesh.vertex_count) + "\t" + str(mesh.faces_count) + "\n")
+            dmd_text.append("Mesh vertices:")
+
+            for vertex in mesh.vertices:
+                dmd_text.append("\t" + str(vertex[0]) + " " + str(vertex[1]) + " " + str(vertex[2]) + "\n")
+
+            dmd_text.append("end vertices\n")
+            dmd_text.append("Mesh faces:\n")
+
+            for face in mesh.faces:
+                face_line = "\t"
+                for f in face:
+                    face_line += str(f + 1) + " "
+
+                dmd_text.append(face_line + "\n")
+
+            dmd_text.append("end faces\n")
+            dmd_text.append("end mesh\n")
+
+        dmd_text.append("New Texture:\n")
+        dmd_text.append("numverts numfaces\n")
+        dmd_text.append("\t" + str(dmd_model.tex_v_count) + "\t" + str(dmd_model.tex_f_count) + "\n")
+        dmd_text.append("Texture vertices:\n")
+
+        for tex_vertex in dmd_model.tex_vertices:
+            dmd_text.append("\t" + str(tex_vertex[0]) + " " + str(tex_vertex[1]) + " " + str(tex_vertex[2]) + "\n")
+
+        dmd_text.append("end texture vertices\n")
+        dmd_text.append("Texture faces:\n")
+
+        for tex_face in dmd_model.tex_faces:
+            face_line = "\t";
+            for f in tex_face:
+                face_line += str(f + 1) + " "
+
+            dmd_text.append(face_line + "\n")
+
+        dmd_text.append("end texture faces\n")
+        dmd_text.append("end of texture\n")
+        dmd_text.append("end of file\n")
+
+        try:
+
+            f = open(path, "wt", encoding="utf-8")
+            f.writelines(dmd_text)
+            f.close()
+
+        except Exception as ex:
+            print(ex)
+            return
+
+
 
