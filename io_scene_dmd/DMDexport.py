@@ -54,4 +54,23 @@ class Exporter:
 
                 dmd_model.meshes.append(mesh)
 
+                if obj.material_slots:
+                    mat = obj.material_slots[0].material
+
+                    if mat.texture_slots:
+                        dmd_model.texture_present = True
+
+                        for f in md.polygons:
+                            tex_face = []
+                            for uv_layer in md.uv_layers:
+                                for i in f.loop_indices:
+                                    tex_face.append(i)
+                                    uv = uv_layer.data[i].uv
+                                    texel = [uv[0], uv[1], 0.0]
+                                    dmd_model.tex_vertices.append(texel)
+                                    dmd_model.tex_v_count += 1;
+
+                                dmd_model.tex_faces.append(tex_face)
+                                dmd_model.tex_f_count += 1;
+
         dmd_model.writeToFile(path, dmd_model)

@@ -141,6 +141,8 @@ class MultyMesh:
                 print(ex)
                 return
 
+        print("Vertices: ", mesh.vertices)
+
         line = dmd_cont.getLine()
         line = dmd_cont.getLine()
 
@@ -148,16 +150,21 @@ class MultyMesh:
         # в предыдущем блоке
         for i in range(0, mesh.faces_count):
             line = dmd_cont.getLine()
-            face_data = line.rstrip('\t').split(" ")
+            face_data = line.strip('\t').strip('\n').split(" ")
+            print(face_data)
             face = []
             for f in face_data:
                 try:
-                    face.append(int(f) - 1)
+                    idx = int(f) - 1
+                    print(idx)
+                    face.append(idx)
                 except Exception as ex:
                     print(ex)
-                    return
+                    pass
 
             mesh.faces.append(face)
+
+        print("Faces: ", mesh.faces)
 
         # Запоминаем родительский контейнер (MultyMesh)
         mesh.parent = self
@@ -204,21 +211,25 @@ class MultyMesh:
                 print(ex)
                 return
 
+        print("Texture vertices: ", self.tex_vertices)
+
         line = dmd_cont.getLine()
         line = dmd_cont.getLine()
 
         # Читаем текстурированные грани
         for i in range(0, self.tex_f_count):
             line = dmd_cont.getLine()
-            face_data = line.strip('\t').split(" ")
+            face_data = line.strip('\t').strip('\n').split(" ")
             face = []
             for f in face_data:
                 try:
                     face.append(int(f) - 1)
                 except Exception as ex:
                     print(ex)
-                    return
+                    pass
             self.tex_faces.append(face)
+
+        print("Texture faces: ", self.tex_faces)
 
         self.texture_present = True
 
@@ -236,6 +247,7 @@ class MultyMesh:
         # Цикл построчного разбора файла
         line = dmd_cont.getLine()
         while  line is not None:
+
             if line == "New object":
                 self.readNextMesh(dmd_cont)
 
@@ -244,59 +256,64 @@ class MultyMesh:
 
             line = dmd_cont.getLine()
 
-
+    #---------------------------------------------------------------------------
+    #
+    #---------------------------------------------------------------------------
     def writeToFile(self, path, dmd_model):
 
         dmd_text = []
-        dmd_text.append("New onject\n")
+        dmd_text.append("New object\n")
 
         for mesh in dmd_model.meshes:
             dmd_text.append("TriMesh()\n")
             dmd_text.append("numverts numfaces\n")
-            dmd_text.append("\t" +str(mesh.vertex_count) + "\t" + str(mesh.faces_count) + "\n")
-            dmd_text.append("Mesh vertices:")
+            dmd_text.append("   " +str(mesh.vertex_count) + "        " + str(mesh.faces_count) + '\n')
+            dmd_text.append("Mesh vertices:\n")
 
             for vertex in mesh.vertices:
-                dmd_text.append("\t" + str(vertex[0]) + " " + str(vertex[1]) + " " + str(vertex[2]) + "\n")
+                dmd_text.append('\t' + str(vertex[0]) + " " + str(vertex[1]) + " " + str(vertex[2]) + '\n')
 
             dmd_text.append("end vertices\n")
             dmd_text.append("Mesh faces:\n")
 
             for face in mesh.faces:
-                face_line = "\t"
+                face_line = '\t'
                 for f in face:
                     face_line += str(f + 1) + " "
 
-                dmd_text.append(face_line + "\n")
+                dmd_text.append(face_line + '\n')
 
             dmd_text.append("end faces\n")
             dmd_text.append("end mesh\n")
 
-        dmd_text.append("New Texture:\n")
-        dmd_text.append("numverts numfaces\n")
-        dmd_text.append("\t" + str(dmd_model.tex_v_count) + "\t" + str(dmd_model.tex_f_count) + "\n")
-        dmd_text.append("Texture vertices:\n")
+        if dmd_model.texture_present:
 
-        for tex_vertex in dmd_model.tex_vertices:
-            dmd_text.append("\t" + str(tex_vertex[0]) + " " + str(tex_vertex[1]) + " " + str(tex_vertex[2]) + "\n")
+            dmd_text.append("New Texture:\n")
+            dmd_text.append("numtverts numtfaces\n")
+            dmd_text.append("   " + str(dmd_model.tex_v_count) + "        " + str(dmd_model.tex_f_count) + '\n')
+            dmd_text.append("Texture vertices:\n")
 
-        dmd_text.append("end texture vertices\n")
-        dmd_text.append("Texture faces:\n")
+            for tex_vertex in dmd_model.tex_vertices:
+                dmd_text.append('\t' + str(tex_vertex[0]) + " " + str(tex_vertex[1]) + " " + str(tex_vertex[2]) + '\n')
 
-        for tex_face in dmd_model.tex_faces:
-            face_line = "\t";
-            for f in tex_face:
-                face_line += str(f + 1) + " "
+            dmd_text.append("end texture vertices\n")
+            dmd_text.append("Texture faces:\n")
 
-            dmd_text.append(face_line + "\n")
+            for tex_face in dmd_model.tex_faces:
+                face_line = '\t';
+                for f in tex_face:
+                    face_line += str(f + 1) + " "
 
-        dmd_text.append("end texture faces\n")
-        dmd_text.append("end of texture\n")
+                dmd_text.append(face_line + '\n')
+
+            dmd_text.append("end texture faces\n")
+            dmd_text.append("end of texture\n")
+
         dmd_text.append("end of file\n")
 
         try:
 
-            f = open(path, "wt", encoding="utf-8")
+            f = open(path, "wt", encoding="ascii")
             f.writelines(dmd_text)
             f.close()
 

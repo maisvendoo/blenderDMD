@@ -1,3 +1,4 @@
 __pycache__/
 .idea/
+venv/
 debug.py
