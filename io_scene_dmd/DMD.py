@@ -281,7 +281,8 @@ class MultyMesh:
                 for f in face:
                     face_line += str(f + 1) + " "
 
-                dmd_text.append(face_line + '\n')
+                face_line = face_line[:-1] + '\n'
+                dmd_text.append(face_line)
 
             dmd_text.append("end faces\n")
             dmd_text.append("end mesh\n")
@@ -304,7 +305,8 @@ class MultyMesh:
                 for f in tex_face:
                     face_line += str(f + 1) + " "
 
-                dmd_text.append(face_line + '\n')
+                face_line = face_line[:-1] + '\n'
+                dmd_text.append(face_line)
 
             dmd_text.append("end texture faces\n")
             dmd_text.append("end of texture\n")

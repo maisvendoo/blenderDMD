@@ -34,19 +34,22 @@ class Exporter:
 
                 print("Process object: " + obj.name)
 
-                md = obj.data
+                model = obj.data
 
-                bpy.ops.object.mode_set(mode='EDIT')
-                bm = bmesh.from_edit_mesh(md)
-                bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method=0, ngon_method=0)
-                bmesh.update_edit_mesh(md, True)
-                bpy.ops.object.mode_set(mode='OBJECT')
+                bm = bmesh.new()
+                bm.from_mesh(model)
+                bmesh.ops.triangulate(bm, faces=bm.faces)
+                md = bpy.data.meshes.new("temporary")
+                bm.to_mesh(md)
+                bm.free()
 
                 mesh = Mesh()
 
+                vert_indices = []
                 for vertex in md.vertices:
                     mesh.vertices.append(list(vertex.co))
                     mesh.vertex_count += 1
+                    vert_indices.append(mesh.vertex_count)
 
                 for face in md.polygons:
                     mesh.faces.append(list(face.vertices))
@@ -60,21 +63,27 @@ class Exporter:
                     if mat.texture_slots:
                         dmd_model.texture_present = True
 
-                        loop_vert = {l.index: l.vertex_index for l in md.loops}
+                        for poly in md.polygons:
+                            print("Polygon: ", poly.index)
+                            for li in poly.loop_indices:
+                                vi = md.loops[li].vertex_index
+                                uv = md.uv_layers.active.data[li].uv
+                                print("   Loop index %i (Vertex %i) - UV %f %f" % (li, vi, uv.x, uv.y))
 
-                        for f in md.polygons:
+                        # Читаем текстурные вершины
+                        for poly in md.polygons:
                             tex_face = []
-                            for loop in f.loop_indices:
-                                uv = md.uv_layers.active.data[loop].uv
-                                print(uv)
-                                tmp = list(uv)
-                                texel = [tmp[0], 1 - tmp[1], 0.0]
+                            for li in poly.loop_indices:
+                                uv = md.uv_layers.active.data[li].uv
+                                texel = [uv.x, 1 - uv.y, 0.0]
                                 dmd_model.tex_vertices.append(texel)
                                 dmd_model.tex_v_count += 1;
-
-                                tex_face.append(loop_vert[loop])
+                                print(li)
+                                tex_face.append(li)
 
                             dmd_model.tex_faces.append(tex_face)
-                            dmd_model.tex_f_count += 1;
+                            dmd_model.tex_f_count += 1
+
+
 
         dmd_model.writeToFile(path, dmd_model)
