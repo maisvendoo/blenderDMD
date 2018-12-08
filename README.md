@@ -8,4 +8,4 @@ This plugin provide import of geometry and UV-map from *.dmd models file. This f
 
 Also, you can create models for ZDSimulator in Blender and export it in DMD-format
 
-![](https://habrastorage.org/webt/1l/sj/y2/1lsjy2qdzyatwbdobpwynvy5epi.png)
+![](https://habrastorage.org/webt/tx/pz/zx/txpzzxwe70iqkw0whrltcwlvwa0.png)
