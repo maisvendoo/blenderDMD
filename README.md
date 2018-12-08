@@ -8,6 +8,6 @@ This plugin provide import of geometry and UV-map from *.dmd models file. This f
 
 Also, you can create models for ZDSimulator in Blender and export it in DMD-format
 
-**Caution!** Before insertion texture in ZDSimulator, you must flip it vertical in any image editor (sucha as Paint in Windows or other). It is temporary problem, but I'll solve it in future time.
+**Caution!** Before insertion texture in ZDSimulator, you must flip it vertical in any image editor (such as Paint in Windows or other). It is temporary problem, but I'll solve it in future time.
 
 ![](https://habrastorage.org/webt/tx/pz/zx/txpzzxwe70iqkw0whrltcwlvwa0.png)
